@@ -1,0 +1,14 @@
+{
+  "name": "chat-sample",
+  "version": "1.0.0",
+  "description": "",
+  "main": "sha1.js",
+  "scripts": {
+    "start": "node sha1.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "utf8": "^3.0.0"
+  }
+}
