@@ -6,10 +6,10 @@ $ npm i
 ```
 After dependencies are installed, run the script with:
 ```
-$ node index.js --text="Your text message"
+$ node index.js sha1 --text="Your text message"
 ```
 
 To read a message from the file, use the command: 
 ```
-$ node index.js --filePath="./pathToYourFile.*"
+$ node index.js file --filePath="./pathToYourFile.*"
 ```
