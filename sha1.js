@@ -2,31 +2,33 @@ const utf8 = require('utf8');
 
 class Sha1Generator {
 
+    constructor() {}
+
     generateSha1(msg) {
-    
+
         const encodedMsg = utf8.encode(msg);
-    
+
         let H0 = 0x67452301;
         let H1 = 0xEFCDAB89;
         let H2 = 0x98BADCFE;
         let H3 = 0x10325476;
         let H4 = 0xC3D2E1F0;
-    
+
         const wordArray = this.getWordBlocks(encodedMsg);
-    
+
         wordArray.forEach(block => {
-    
+
             let word = [...block];
 
             const { rotateLeft } = this;
-    
+
             // Extend the sixteen 32-bit words into eighty 32-bit words
             for (let i = 16; i <= 79; i++) {
                 word[i] = rotateLeft(word[i - 3] ^ word[i - 8] ^ word[i - 14] ^ word[i - 16], 1);
             }
-    
+
             let A, B, C, D, E;
-    
+
             A = H0;
             B = H1;
             C = H2;
@@ -73,20 +75,20 @@ class Sha1Generator {
         });
 
         const { hexToString } = this;
-    
+
         return hexToString(H0 << 128) + hexToString(H1 << 96) + hexToString(H2 << 64) + hexToString(H3 << 32) + hexToString(H4);
     }
 
     getWordBlocks(msg) {
-    
+
         let wordArray = [];
-    
+
         // Generate 32-bit big endian ints for all message substrings that have 4 length
         for (let i = 0; i < msg.length - 3; i += 4) {
             const j = msg.charCodeAt(i) << 24 | msg.charCodeAt(i + 1) << 16 | msg.charCodeAt(i + 2) << 8 | msg.charCodeAt(i + 3);
             wordArray.push(j);
         }
-        
+
         // Generate 32-bit ints for any leftover chars and append the bit '1'
         switch (msg.length % 4) {
             case 0:
@@ -102,23 +104,23 @@ class Sha1Generator {
                 wordArray.push(msg.charCodeAt(msg.length - 3) << 24 | msg.charCodeAt(msg.length - 2) << 16 | msg.charCodeAt(msg.length - 1) << 8 | 0x80);
                 break;
         }
-    
+
         // Append bits '0', such that the resulting message length in bits is congruent to −64 ≡ 448 (mod 512)
         while ((wordArray.length % 16) != 14) {
             wordArray.push(0);
         }
-    
+
         // Javascript does not have 64 bit ints, so the message length is bits is pushed as succesive two 32-bit ints
         wordArray.push(msg.length >>> 29);
         wordArray.push((msg.length << 3));
-    
+
         //Split the word into arrays that contain 512-bit chunks i.e 16 32-bit words
         let blockArray = [];
-    
+
         for (let blockStart = 0; blockStart < wordArray.length; blockStart += 16) {
             blockArray.push(wordArray.slice(blockStart, blockStart + 16));
         }
-    
+
         return blockArray;
     }
 
@@ -127,14 +129,10 @@ class Sha1Generator {
         return (value >>> 0).toString(16);
     }
 
-    rotateLeft(n, s) {
-        let t4 = (n << s) | (n >>> (32 - s));
+    rotateLeft(value, shift) {
+        let t4 = (value << shift) | (value >>> (32 - shift));
         return t4;
     }
 }
 
-const generator = new Sha1Generator();
-
-const plainText = 'Hello World!';
-const sha1Encrypted = generator.generateSha1(plainText); 
-console.log(sha1Encrypted);
+module.exports = Sha1Generator;
